@@ -272,6 +272,8 @@
     let secretMode = false;
     let clickCount = 0;
     let lastClickTime = 0;
+    let gameRunning = false;
+    let spawnInterval;
 
     const winningConditions = [
         [0, 1, 2], [3, 4, 5], [6, 7, 8],
@@ -488,120 +490,139 @@ statusText.textContent = `Vez do jogador ${currentPlayer}`;
 
 function startSpaceInvaders() {
     const existingGame = document.getElementById('spaceInvaders');
-    if (existingGame) existingGame.remove();
-    const container = document.createElement('div');
-    container.id = 'spaceInvaders';
-    container.innerHTML = `
-        <div id="playerShip"></div>
-        <div id="gameScore">0</div>
-    `;
-    document.body.appendChild(container);
+        if (existingGame) existingGame.remove();
+
+        gameRunning = true;
+        devMessageShown = false;
+
+        const container = document.createElement('div');
+        container.id = 'spaceInvaders';
+        container.innerHTML = `
+            <div id="playerShip"></div>
+            <div id="gameScore">0</div>
+        `;
+        document.body.appendChild(container);
 
     container.style.display = 'block';
     document.querySelector('.container').style.display = 'none';
     
     const playerShip = document.getElementById('playerShip');
-    playerShip.addEventListener('click', shoot);
 
-    let playerX = 50;
-    let bullets = [];
-    let enemies = [];
-    let score = 0;
-    let gameActive = true;
+        let playerX = 50;
+        let bullets = [];
+        let enemies = [];
+        let score = 0;
+        let canShoot = true;
 
-    function movePlayer(e) {
-        if(!gameActive) return;
-        const speed = e.key === 'ArrowLeft' ? -10 : e.key === 'ArrowRight' ? 10 : 0;
-        playerX = Math.min(Math.max(playerX + speed, 5), 95);
-        document.getElementById('playerShip').style.left = `${playerX}%`;
-    }
-
-    function shoot() {
-        if(!gameActive) return;
-        const bullet = document.createElement('div');
-        bullet.className = 'bullet';
-        const playerRect = document.getElementById('playerShip').getBoundingClientRect();
-        bullet.style.left = `${playerRect.left + 18}px`;
-        bullet.style.top = `${playerRect.top - 20}px`;
-        container.appendChild(bullet);
-        bullets.push(bullet);
-    }
-
-    function spawnEnemy() {
-        if(!gameActive) return;
-        const enemy = document.createElement('div');
-        enemy.className = 'enemyShip';
-        enemy.style.left = `${Math.random() * 90}%`;
-        enemy.style.top = '10%';
-        container.appendChild(enemy);
-        enemies.push({
-            element: enemy,
-            x: parseFloat(enemy.style.left),
-            dir: Math.random() > 0.5 ? 1 : -1
-        });
-    }
-
-    function checkCollision(bullet, enemy) {
-        const bRect = bullet.getBoundingClientRect();
-        const eRect = enemy.getBoundingClientRect();
-        return !(bRect.right < eRect.left || 
-               bRect.left > eRect.right || 
-               bRect.bottom < eRect.top || 
-               bRect.top > eRect.bottom);
-    }
-
-    function gameLoop() {
-        if(!gameActive) return;
-
-        bullets.forEach((bullet, index) => {
-            const top = parseFloat(bullet.style.top) || window.innerHeight;
-            if(top < 0) {
-                bullet.remove();
-                bullets.splice(index, 1);
-            } else {
-                bullet.style.top = `${top - 10}px`;
+        function handleShoot() {
+            if (canShoot && gameRunning) {
+                shoot();
+                canShoot = false;
+                setTimeout(() => canShoot = true, 300);
             }
-        });
+        }
 
-        enemies.forEach((enemy, index) => {
-            enemy.x += enemy.dir;
-            if(enemy.x > 90 || enemy.x < 0) enemy.dir *= -1;
-            enemy.element.style.left = `${enemy.x}%`;
+        playerShip.addEventListener('click', handleShoot);
 
-            bullets.forEach((bullet, bIndex) => {
-                if(checkCollision(bullet, enemy.element)) {
-                    enemy.element.remove();
+        function movePlayer(e) {
+            if (!gameRunning) return;
+            const speed = e.key === 'ArrowLeft' ? -2 : e.key === 'ArrowRight' ? 2 : 0;
+            playerX = Math.min(Math.max(playerX + speed, 5), 95);
+            playerShip.style.left = `${playerX}%`;
+        }
+
+        function shoot() {
+            const bullet = document.createElement('div');
+            bullet.className = 'bullet';
+            const playerRect = playerShip.getBoundingClientRect();
+            bullet.style.left = `${playerRect.left + 18}px`;
+            bullet.style.top = `${playerRect.top - 20}px`;
+            container.appendChild(bullet);
+            bullets.push(bullet);
+        }
+
+        function spawnEnemy() {
+            if (!gameRunning) return;
+            const enemy = document.createElement('div');
+            enemy.className = 'enemyShip';
+            enemy.style.left = `${Math.random() * 90}%`;
+            enemy.style.top = '10%';
+            container.appendChild(enemy);
+            enemies.push({
+                element: enemy,
+                x: parseFloat(enemy.style.left),
+                dir: Math.random() > 0.5 ? 1 : -1
+            });
+        }
+
+        function checkCollision(bullet, enemy) {
+            const bRect = bullet.getBoundingClientRect();
+            const eRect = enemy.getBoundingClientRect();
+            return !(bRect.right < eRect.left || 
+                bRect.left > eRect.right || 
+                bRect.bottom < eRect.top || 
+                bRect.top > eRect.bottom);
+        }
+
+        function gameLoop() {
+            if (!gameRunning) return;
+
+            bullets.forEach((bullet, index) => {
+                const top = parseFloat(bullet.style.top) || window.innerHeight;
+                if (top < 0) {
                     bullet.remove();
-                    enemies.splice(index, 1);
-                    bullets.splice(bIndex, 1);
-                    score++;
-                    document.getElementById('gameScore').textContent = score;
-
-                    if(score >= 15 && !devMessageShown) {
-                        showSubliminalMessage();
-                        devMessageShown = true;
-                        gameActive = false;
-                    }
+                    bullets.splice(index, 1);
+                } else {
+                    bullet.style.top = `${top - 10}px`;
                 }
             });
-        });
 
-        requestAnimationFrame(gameLoop);
-    }
+            enemies.forEach((enemy, index) => {
+                enemy.x += enemy.dir;
+                if (enemy.x > 90 || enemy.x < 0) enemy.dir *= -1;
+                enemy.element.style.left = `${enemy.x}%`;
 
-    function showSubliminalMessage() {
-        const msg = document.createElement('div');
-        msg.className = 'subliminal';
-        msg.textContent = 'DEV TEAM: VF, JP, MC';
-        container.appendChild(msg);
-        msg.style.display = 'block';
+                bullets.forEach((bullet, bIndex) => {
+                    if (checkCollision(bullet, enemy.element)) {
+                        enemy.element.remove();
+                        bullet.remove();
+                        enemies.splice(index, 1);
+                        bullets.splice(bIndex, 1);
+                        score++;
+                        document.getElementById('gameScore').textContent = score;
 
-        setTimeout(() => {
-            container.remove();
-            document.querySelector('.container').style.display = 'block';
-            resetGame();
-        }, 2000);
-    }
+                        if (score >= 15 && !devMessageShown) {
+                            showSubliminalMessage();
+                            devMessageShown = true;
+                            gameRunning = false;
+                        }
+                    }
+                });
+            });
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        document.addEventListener('keydown', movePlayer);
+        spawnInterval = setInterval(spawnEnemy, 2000);
+        gameLoop();
+
+        function showSubliminalMessage() {
+            clearInterval(spawnInterval);
+            const container = document.getElementById('spaceInvaders');
+            const msg = document.createElement('div');
+            msg.className = 'subliminal';
+            msg.textContent = 'DEV TEAM: VF, JP, MC';
+            container.appendChild(msg);
+            msg.style.display = 'block';
+
+            setTimeout(() => {
+                container.remove();
+                document.querySelector('.container').style.display = 'block';
+                gameRunning = false;
+                resetGame();
+            }, 2000);
+        }
 
     document.addEventListener('keydown', (e) => {
         if(['ArrowLeft', 'ArrowRight'].includes(e.key)) movePlayer(e);
@@ -612,14 +633,14 @@ function startSpaceInvaders() {
     gameLoop();
 }
 
-document.querySelector('h1').addEventListener('click', () => {
-    clickCount++;
-    if(clickCount === 3) {
-        clickCount = 0;
-        startSpaceInvaders();
-    }
-    setTimeout(() => clickCount = 0, 1000);
-});
+    document.querySelector('h1').addEventListener('click', () => {
+        clickCount++;
+        if (clickCount === 3) {
+            clickCount = 0;
+            startSpaceInvaders();
+        }
+        setTimeout(() => clickCount = 0, 1000);
+    });
 
     resetGame();
 </script>
