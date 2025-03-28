@@ -166,6 +166,96 @@
         background-color: #20c997 !important;
         border-color: #1aa179 !important;
     }
+
+    #spaceInvaders {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.9);
+        display: none;
+        z-index: 1000;
+    }
+
+    #playerShip {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        width: 40px;
+        height: 40px;
+        background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%2300ff00" d="M12 2L2 22h20z"/></svg>');
+        transform: translateX(-50%);
+    }
+
+    .enemyShip {
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="%23ff0000"/></svg>');
+    }
+
+    .bullet {
+        position: absolute;
+        width: 4px;
+        height: 20px;
+        background: #ff0;
+    }
+
+    #gameScore {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        color: #fff;
+        font-size: 24px;
+    }
+
+    .subliminal {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: #0f0;
+        font-size: 40px;
+        text-shadow: 0 0 10px #0f0;
+        display: none;
+        animation: subliminal 0.1s 10;
+    }
+
+    @keyframes subliminal {
+        0% { opacity: 0; }
+        50% { opacity: 1; }
+        100% { opacity: 0; }
+    }
+
+    .mobile-controls {
+        position: fixed;
+        bottom: 20px;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: space-between;
+        padding: 0 20px;
+        touch-action: manipulation;
+    }
+
+    .control-btn {
+        width: 60px;
+        height: 60px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 24px;
+        color: white;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    #shootBtn {
+        background: rgba(255, 0, 0, 0.5);
+    }
     
 </style>
 </head>
@@ -204,6 +294,8 @@
     let secretMode = false;
     let clickCount = 0;
     let lastClickTime = 0;
+    let moveInterval;
+    let moveDirection = 0;
 
     const winningConditions = [
         [0, 1, 2], [3, 4, 5], [6, 7, 8],
@@ -415,6 +507,165 @@ statusText.textContent = `Vez do jogador ${currentPlayer}`;
         
         cells.forEach(c => c.classList.remove('disabled'));
     }
+
+    let devMessageShown = false;
+
+function startSpaceInvaders() {
+    const container = document.createElement('div');
+    container.id = 'spaceInvaders';
+    container.innerHTML = `
+        <div id="playerShip"></div>
+        <div id="gameScore">0</div>
+    `;
+    document.body.appendChild(container);
+    container.style.display = 'block';
+    document.querySelector('.container').style.display = 'none';
+
+    let playerX = 50;
+    let bullets = [];
+    let enemies = [];
+    let score = 0;
+    let gameActive = true;
+
+    function movePlayer(e) {
+        if(!gameActive) return;
+        const speed = e.key === 'ArrowLeft' ? -10 : e.key === 'ArrowRight' ? 10 : 0;
+        playerX = Math.min(Math.max(playerX + speed, 5), 95);
+        document.getElementById('playerShip').style.left = `${playerX}%`;
+    }
+
+    function shoot() {
+        if(!gameActive) return;
+        const bullet = document.createElement('div');
+        bullet.className = 'bullet';
+        const playerRect = document.getElementById('playerShip').getBoundingClientRect();
+        bullet.style.left = `${playerRect.left + 18}px`;
+        bullet.style.top = `${playerRect.top - 20}px`;
+        container.appendChild(bullet);
+        bullets.push(bullet);
+    }
+
+    function spawnEnemy() {
+        if(!gameActive) return;
+        const enemy = document.createElement('div');
+        enemy.className = 'enemyShip';
+        enemy.style.left = `${Math.random() * 90}%`;
+        enemy.style.top = '10%';
+        container.appendChild(enemy);
+        enemies.push({
+            element: enemy,
+            x: parseFloat(enemy.style.left),
+            dir: Math.random() > 0.5 ? 1 : -1
+        });
+    }
+
+    function checkCollision(bullet, enemy) {
+        const bRect = bullet.getBoundingClientRect();
+        const eRect = enemy.getBoundingClientRect();
+        return !(bRect.right < eRect.left || 
+               bRect.left > eRect.right || 
+               bRect.bottom < eRect.top || 
+               bRect.top > eRect.bottom);
+    }
+
+    function gameLoop() {
+        if(!gameActive) return;
+
+        bullets.forEach((bullet, index) => {
+            const top = parseFloat(bullet.style.top) || window.innerHeight;
+            if(top < 0) {
+                bullet.remove();
+                bullets.splice(index, 1);
+            } else {
+                bullet.style.top = `${top - 10}px`;
+            }
+        });
+
+        enemies.forEach((enemy, index) => {
+            enemy.x += enemy.dir;
+            if(enemy.x > 90 || enemy.x < 0) enemy.dir *= -1;
+            enemy.element.style.left = `${enemy.x}%`;
+
+            bullets.forEach((bullet, bIndex) => {
+                if(checkCollision(bullet, enemy.element)) {
+                    enemy.element.remove();
+                    bullet.remove();
+                    enemies.splice(index, 1);
+                    bullets.splice(bIndex, 1);
+                    score++;
+                    document.getElementById('gameScore').textContent = score;
+
+                    if(score >= 15 && !devMessageShown) {
+                        showSubliminalMessage();
+                        devMessageShown = true;
+                        gameActive = false;
+                    }
+                }
+            });
+        });
+
+        requestAnimationFrame(gameLoop);
+    }
+
+    function showSubliminalMessage() {
+        const msg = document.createElement('div');
+        msg.className = 'subliminal';
+        msg.textContent = 'DEV TEAM: VF, JP, MC';
+        container.appendChild(msg);
+        msg.style.display = 'block';
+
+        setTimeout(() => {
+            container.remove();
+            document.querySelector('.container').style.display = 'block';
+        }, 2000);
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if(['ArrowLeft', 'ArrowRight'].includes(e.key)) movePlayer(e);
+        if(e.code === 'Space') shoot();
+    });
+
+    setInterval(spawnEnemy, 2000);
+    gameLoop();
+}
+
+document.querySelector('h1').addEventListener('click', () => {
+    clickCount++;
+    if(clickCount === 3) {
+        clickCount = 0;
+        startSpaceInvaders();
+    }
+    setTimeout(() => clickCount = 0, 1000);
+});
+
+function startMove(direction) {
+    moveDirection = direction;
+    moveInterval = setInterval(() => {
+        if(!gameActive) return;
+        playerX = Math.min(Math.max(playerX + (direction * 5), 5, 95));
+        document.getElementById('playerShip').style.left = `${playerX}%`;
+    }, 50);
+}
+
+function stopMove() {
+    clearInterval(moveInterval);
+    moveDirection = 0;
+}
+
+document.querySelector('#leftBtn').addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    startMove(-1);
+});
+document.querySelector('#rightBtn').addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    startMove(1);
+});
+document.querySelector('#leftBtn').addEventListener('touchend', stopMove);
+document.querySelector('#rightBtn').addEventListener('touchend', stopMove);
+document.querySelector('#shootBtn').addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    shoot();
+});
 
     resetGame();
 </script>
