@@ -516,6 +516,7 @@ function startSpaceInvaders() {
     const playerShip = document.getElementById('playerShip');
 
     let touchStartX = 0;
+    let lastShotTime = 0;
 
     container.addEventListener('touchstart', (e) => {
         touchStartX = e.touches[0].clientX;
