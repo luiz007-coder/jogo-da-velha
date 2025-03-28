@@ -92,11 +92,16 @@
     border-bottom: 3px solid #ac1010;
     border-radius: 10px;
     cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
+    transition: all 0.3s ease;
+    user-select: none;
     }
 
     .reset-btn:hover {
     background-color: #ff1a1a;
+    }
+
+    .reset-btn:active {
+        transform: scale(0.95);
     }
 
     @keyframes fadeIn {
