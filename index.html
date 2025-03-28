@@ -268,7 +268,7 @@
     let currentPlayer = 'X';
     let gameState = ['', '', '', '', '', '', '', '', ''];
     let gameActive = true;
-    let aiDifficulty = 'hard';
+    let aiDifficulty = 'easy';
     let secretMode = false;
     let clickCount = 0;
     let lastClickTime = 0;
@@ -515,14 +515,37 @@ function startSpaceInvaders() {
         let canShoot = true;
 
         function handleShoot() {
-            if (canShoot && gameRunning) {
-                shoot();
-                canShoot = false;
-                setTimeout(() => canShoot = true, 300);
-            }
+            if (!gameRunning) return;
+            
+            const now = Date.now();
+            if (now - lastShotTime < 300) return;
+            
+            lastShotTime = now;
+            shoot();
         }
 
         playerShip.addEventListener('click', handleShoot);
+        playerShip.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            handleShoot();
+        });
+
+        let touchStartX = 0;
+        playerShip.addEventListener('touchstart', function(e) {
+            touchStartX = e.touches[0].clientX;
+            e.preventDefault();
+        });
+
+        playerShip.addEventListener('touchmove', function(e) {
+            if (!gameRunning) return;
+            
+            const touch = e.touches[0];
+            const deltaX = touch.clientX - touchStartX;
+            playerX = Math.min(Math.max(playerX + (deltaX * 0.5), 5), 95);
+            playerShip.style.left = `${playerX}%`;
+            touchStartX = touch.clientX;
+            e.preventDefault();
+        });
 
         function movePlayer(e) {
             if (!gameRunning) return;
@@ -532,6 +555,7 @@ function startSpaceInvaders() {
         }
 
         function shoot() {
+            if (bullets.length >= 3) return;
             const bullet = document.createElement('div');
             bullet.className = 'bullet';
             const playerRect = playerShip.getBoundingClientRect();
@@ -608,6 +632,10 @@ function startSpaceInvaders() {
         gameLoop();
 
         function showSubliminalMessage() {
+            const playerShip = document.getElementById('playerShip');
+                if (playerShip) {
+                    playerShip.replaceWith(playerShip.cloneNode(true));
+                }
             clearInterval(spawnInterval);
             const container = document.getElementById('spaceInvaders');
             const msg = document.createElement('div');
