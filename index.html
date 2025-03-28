@@ -318,7 +318,9 @@ statusText.textContent = `Vez do jogador ${currentPlayer}`;
         if (state.every(cell => cell !== '')) return { score: 0 };
 
         let best = { score: isMaximizing ? -Infinity : Infinity };
-        for (let i = 0; i < 9; i++) {
+        const movePriority = [4, 0, 2, 6, 8, 1, 3, 5, 7];
+
+        for (const i of movePriority) {
             if (state[i] !== '') continue;
             
             state[i] = isMaximizing ? 'O' : 'X';
@@ -326,13 +328,11 @@ statusText.textContent = `Vez do jogador ${currentPlayer}`;
             state[i] = '';
 
             if (isMaximizing) {
-                if (result.score > best.score || 
-                   (result.score === best.score && depth % 2 === 0)) {
+                if (result.score > best.score) {
                     best = { score: result.score, move: i };
                 }
             } else {
-                if (result.score < best.score || 
-                   (result.score === best.score && depth % 2 === 0)) {
+                if (result.score < best.score) {
                     best = { score: result.score, move: i };
                 }
             }
