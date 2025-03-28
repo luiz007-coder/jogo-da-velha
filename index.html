@@ -229,11 +229,11 @@
     }
 
     .mobile-controls {
+        display: none;
         position: fixed;
         bottom: 20px;
         left: 0;
         right: 0;
-        display: flex;
         justify-content: space-between;
         padding: 0 20px;
         touch-action: manipulation;
@@ -280,6 +280,11 @@
     </div>
     <div class="status"></div>
     <button class="reset-btn">Reiniciar</button>
+    <div class="mobile-controls">
+        <div class="control-btn" id="leftBtn">←</div>
+        <div class="control-btn" id="shootBtn">⚡</div>
+        <div class="control-btn" id="rightBtn">→</div>
+    </div>
 </div>
 <script>
     const board = document.querySelector('.board');
@@ -511,6 +516,7 @@ statusText.textContent = `Vez do jogador ${currentPlayer}`;
     let devMessageShown = false;
 
 function startSpaceInvaders() {
+    document.querySelector('.mobile-controls').style.display = 'flex';
     const container = document.createElement('div');
     container.id = 'spaceInvaders';
     container.innerHTML = `
@@ -618,6 +624,13 @@ function startSpaceInvaders() {
             container.remove();
             document.querySelector('.container').style.display = 'block';
         }, 2000);
+
+        setTimeout(() => {
+            container.remove();
+            document.querySelector('.container').style.display = 'block';
+            document.querySelector('.mobile-controls').style.display = 'none';
+            gameActive = false;
+    }, 2000);
     }
 
     document.addEventListener('keydown', (e) => {
@@ -665,6 +678,20 @@ document.querySelector('#rightBtn').addEventListener('touchend', stopMove);
 document.querySelector('#shootBtn').addEventListener('touchstart', (e) => {
     e.preventDefault();
     shoot();
+});
+
+container.addEventListener('click', () => {
+    if(score >= 15 || !gameActive) {
+        container.remove();
+        document.querySelector('.container').style.display = 'block';
+        document.querySelector('.mobile-controls').style.display = 'none';
+        gameActive = false;
+    }
+});
+
+resetBtn.addEventListener('click', () => {
+    resetGame();
+    document.querySelector('.mobile-controls').style.display = 'none';
 });
 
     resetGame();
