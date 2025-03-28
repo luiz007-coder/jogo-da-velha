@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Velha</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+<style>
+    * {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+font-family: 'Arial', sans-serif;
+}
+
+    body {
+        font-family: 'Poppins', sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+        color: #fff;
+        padding: 20px;
+    }
+
+.container {
+text-align: center;
+}
+
+h1 {
+font-family: 'Poppins', sans-serif;
+font-size: 2.5rem;
+margin-bottom: 20px;
+text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.board {
+font-family: 'Poppins', sans-serif;
+display: grid;
+grid-template-columns: repeat(3, 100px);
+grid-template-rows: repeat(3, 100px);
+gap: 10px;
+margin: 20px auto;
+}
+
+.cell {
+font-family: 'Poppins', sans-serif;
+width: 100px;
+height: 100px;
+background-color: rgba(255, 255, 255, 0.1);
+border: 2px solid #fff;
+display: flex;
+justify-content: center;
+align-items: center;
+font-size: 2rem;
+border-radius: 10px;
+cursor: pointer;
+transition: background-color 0.3s, transform 0.2s;
+}
+
+.cell:hover {
+background-color: rgba(255, 255, 255, 0.2);
+}
+
+.cell.X::before {
+content: 'X';
+color: #ff4d4d;
+animation: popIn 0.3s ease-in-out;
+}
+
+.cell.O::before {
+content: 'O';
+color: #4dff4d;
+animation: popIn 0.3s ease-in-out;
+}
+
+.status {
+font-family: 'Poppins', sans-serif;
+font-size: 1.5rem;
+margin: 20px 0;
+animation: fadeIn 1s ease-in-out;
+}
+
+.reset-btn {
+font-family: 'Poppins', sans-serif;
+padding: 10px 20px;
+font-size: 1rem;
+color: #fff;
+background-color: #ff4d4d;
+border: 1px solid #ac1010;
+border-bottom: 3px solid #ac1010;
+border-radius: 10px;
+cursor: pointer;
+transition: background-color 0.3s, transform 0.2s;
+}
+
+.reset-btn:hover {
+background-color: #ff1a1a;
+}
+
+@keyframes fadeIn {
+from {
+    opacity: 0;
+}
+to {
+    opacity: 1;
+}
+}
+
+@keyframes popIn {
+0% {
+    transform: scale(0);
+}
+50% {
+    transform: scale(1.2);
+}
+100% {
+    transform: scale(1);
+}
+}
+
+    .winning-cell {
+        background: rgba(126, 255, 35, 0.1);
+        border-color: rgb(131, 255, 36);
+    }
+
+    .difficulty {
+        margin-bottom: 20px;
+    }
+
+    .difficulty-btn {
+        padding: 10px 20px;
+        margin: 0 5px;
+        font-size: 1rem;
+        color: #fff;
+        background-color: #1e3c72;
+        border: 1px solid #13274d;
+        border-bottom: 3px solid #13274d;
+        border-radius: 11px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .difficulty-btn:hover {
+        background-color: #1a3566;
+    }
+
+    .difficulty-btn.active {
+        background-color: #33b618;
+        border: 1px solid #1b680b;
+        border-bottom: 3px solid #1b680b;
+    }
+    
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>JOGO DA VELHA</h1>
+    <div class="difficulty">
+        <button class="difficulty-btn" data-difficulty="easy">Fácil</button>
+        <button class="difficulty-btn" data-difficulty="medium">Médio</button>
+        <button class="difficulty-btn active" data-difficulty="hard">Difícil</button>
+    </div>
+    <div class="board">
+        <div class="cell" data-index="0"></div>
+        <div class="cell" data-index="1"></div>
+        <div class="cell" data-index="2"></div>
+        <div class="cell" data-index="3"></div>
+        <div class="cell" data-index="4"></div>
+        <div class="cell" data-index="5"></div>
+        <div class="cell" data-index="6"></div>
+        <div class="cell" data-index="7"></div>
+        <div class="cell" data-index="8"></div>
+    </div>
+    <div class="status"></div>
+    <button class="reset-btn">Reiniciar</button>
+</div>
+<script>
+    const board = document.querySelector('.board');
+    const cells = document.querySelectorAll('.cell');
+    const statusText = document.querySelector('.status');
+    const resetBtn = document.querySelector('.reset-btn');
+
+    let currentPlayer = 'X';
+    let gameState = ['', '', '', '', '', '', '', '', ''];
+    let gameActive = true;
+    let aiDifficulty = 'hard';
+
+    const winningConditions = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8],
+        [0, 3, 6], [1, 4, 7], [2, 5, 8],
+        [0, 4, 8], [2, 4, 6]
+    ];
+
+const winningCells = (combination) => {
+        combination.forEach(index => {
+            cells[index].classList.add('winning-cell');
+        });
+    };
+
+    function handleCellClick(event) {
+        if (currentPlayer !== 'X' || !gameActive) return;
+        
+        const clickedCell = event.target;
+        const clickedCellIndex = parseInt(clickedCell.getAttribute('data-index'));
+
+        if (gameState[clickedCellIndex] !== '') return;
+
+        gameState[clickedCellIndex] = 'X';
+        clickedCell.classList.add('X');
+        checkForWinner();
+    }
+
+function checkForWinner() {
+        let roundWon = false;
+        let winningCombination = null;
+
+        for (const condition of winningConditions) {
+            const [a, b, c] = condition;
+            if (gameState[a] && gameState[a] === gameState[b] && gameState[a] === gameState[c]) {
+                roundWon = true;
+                winningCombination = condition;
+                break;
+            }
+        }
+
+        if (roundWon) {
+            winningCells(winningCombination);
+            statusText.textContent = `Vitória de ${currentPlayer}!`;
+            gameActive = false;
+            return;
+        }
+
+        if (!gameState.includes('')) {
+            statusText.textContent = 'Empate!';
+            gameActive = false;
+            return;
+        }
+
+        currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+        statusText.textContent = `Vez do jogador ${currentPlayer}`;
+
+        if (gameActive && currentPlayer === 'O') {
+            setTimeout(makeAIMove, 500);
+        }
+    }
+
+function resetGame() {
+gameState = ['', '', '', '', '', '', '', '', ''];
+gameActive = true;
+currentPlayer = 'X';
+statusText.textContent = `Vez do jogador ${currentPlayer}`;
+cells.forEach(cell => {
+            cell.classList.remove('X', 'O', 'winning-cell');
+        });
+}
+
+cells.forEach(cell => {
+cell.addEventListener('click', handleCellClick);
+});
+
+resetBtn.addEventListener('click', resetGame);
+
+statusText.textContent = `Vez do jogador ${currentPlayer}`;
+
+    function easyAI() {
+        const emptyCells = gameState.reduce((acc, cell, index) => {
+            if (cell === '') acc.push(index);
+            return acc;
+        }, []);
+        return emptyCells[Math.floor(Math.random() * emptyCells.length)];
+    }
+
+    function mediumAI() {
+        for (const condition of winningConditions) {
+            const [a, b, c] = condition;
+            if (gameState[a] === 'O' && gameState[a] === gameState[b] && gameState[c] === '') return c;
+            if (gameState[a] === 'O' && gameState[c] === 'O' && gameState[b] === '') return b;
+            if (gameState[b] === 'O' && gameState[c] === 'O' && gameState[a] === '') return a;
+        }
+        for (const condition of winningConditions) {
+            const [a, b, c] = condition;
+            if (gameState[a] === 'X' && gameState[a] === gameState[b] && gameState[c] === '') return c;
+            if (gameState[a] === 'X' && gameState[c] === 'X' && gameState[b] === '') return b;
+            if (gameState[b] === 'X' && gameState[c] === 'X' && gameState[a] === '') return a;
+        }
+        return easyAI();
+    }
+
+    function minimax(state, depth, isMaximizing) {
+        const winner = checkWinner(state);
+        if (winner === 'O') return { score: 10 - depth };
+        if (winner === 'X') return { score: depth - 10 };
+        if (state.every(cell => cell !== '')) return { score: 0 };
+
+        let best = { score: isMaximizing ? -Infinity : Infinity };
+        for (let i = 0; i < 9; i++) {
+            if (state[i] !== '') continue;
+            
+            state[i] = isMaximizing ? 'O' : 'X';
+            const result = minimax(state, depth + 1, !isMaximizing);
+            state[i] = '';
+
+            if ((isMaximizing && result.score > best.score) ||
+                (!isMaximizing && result.score < best.score)) {
+                best = { score: result.score, move: i };
+            }
+        }
+        return best;
+    }
+
+    function hardAI() {
+        return minimax([...gameState], 0, true).move;
+    }
+
+    function checkWinner(state) {
+        for (const condition of winningConditions) {
+            const [a, b, c] = condition;
+            if (state[a] && state[a] === state[b] && state[a] === state[c]) return state[a];
+        }
+        return null;
+    }
+
+    function makeAIMove() {
+        if (!gameActive) return;
+        
+        let move;
+        switch (aiDifficulty) {
+            case 'easy': move = easyAI(); break;
+            case 'medium': move = mediumAI(); break;
+            case 'hard': move = hardAI(); break;
+        }
+
+        if (gameState[move] === '') {
+            gameState[move] = 'O';
+            cells[move].classList.add('O');
+            checkForWinner();
+        }
+    }
+
+    document.querySelectorAll('.difficulty-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            document.querySelectorAll('.difficulty-btn').forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            aiDifficulty = this.dataset.difficulty;
+            resetGame();
+        });
+    });
+
+
+    resetGame();
+</script>
+</body>
+</html>
