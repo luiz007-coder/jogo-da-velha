@@ -6,119 +6,119 @@
 <title>Velha</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
 <style>
-    * {
-margin: 0;
-padding: 0;
-box-sizing: border-box;
-font-family: 'Arial', sans-serif;
-}
-
-    body {
-        font-family: 'Poppins', sans-serif;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        background: linear-gradient(135deg, #1e3c72, #2a5298);
-        color: #fff;
-        padding: 20px;
+        * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
     }
 
-.container {
-text-align: center;
-}
+        body {
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: #fff;
+            padding: 20px;
+        }
 
-h1 {
-font-family: 'Poppins', sans-serif;
-font-size: 2.5rem;
-margin-bottom: 20px;
-text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-}
+    .container {
+    text-align: center;
+    }
 
-.board {
-font-family: 'Poppins', sans-serif;
-display: grid;
-grid-template-columns: repeat(3, 100px);
-grid-template-rows: repeat(3, 100px);
-gap: 10px;
-margin: 20px auto;
-}
+    h1 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
 
-.cell {
-font-family: 'Poppins', sans-serif;
-width: 100px;
-height: 100px;
-background-color: rgba(255, 255, 255, 0.1);
-border: 2px solid #fff;
-display: flex;
-justify-content: center;
-align-items: center;
-font-size: 2rem;
-border-radius: 10px;
-cursor: pointer;
-transition: background-color 0.3s, transform 0.2s;
-}
+    .board {
+    font-family: 'Poppins', sans-serif;
+    display: grid;
+    grid-template-columns: repeat(3, 100px);
+    grid-template-rows: repeat(3, 100px);
+    gap: 10px;
+    margin: 20px auto;
+    }
 
-.cell:hover {
-background-color: rgba(255, 255, 255, 0.2);
-}
+    .cell {
+    font-family: 'Poppins', sans-serif;
+    width: 100px;
+    height: 100px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 2px solid #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    }
 
-.cell.X::before {
-content: 'X';
-color: #ff4d4d;
-animation: popIn 0.3s ease-in-out;
-}
+    .cell:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    }
 
-.cell.O::before {
-content: 'O';
-color: #4dff4d;
-animation: popIn 0.3s ease-in-out;
-}
+    .cell.X::before {
+    content: 'X';
+    color: #ff4d4d;
+    animation: popIn 0.3s ease-in-out;
+    }
 
-.status {
-font-family: 'Poppins', sans-serif;
-font-size: 1.5rem;
-margin: 20px 0;
-animation: fadeIn 1s ease-in-out;
-}
+    .cell.O::before {
+    content: 'O';
+    color: #4dff4d;
+    animation: popIn 0.3s ease-in-out;
+    }
 
-.reset-btn {
-font-family: 'Poppins', sans-serif;
-padding: 10px 20px;
-font-size: 1rem;
-color: #fff;
-background-color: #ff4d4d;
-border: 1px solid #ac1010;
-border-bottom: 3px solid #ac1010;
-border-radius: 10px;
-cursor: pointer;
-transition: background-color 0.3s, transform 0.2s;
-}
+    .status {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.5rem;
+    margin: 20px 0;
+    animation: fadeIn 1s ease-in-out;
+    }
 
-.reset-btn:hover {
-background-color: #ff1a1a;
-}
+    .reset-btn {
+    font-family: 'Poppins', sans-serif;
+    padding: 10px 20px;
+    font-size: 1rem;
+    color: #fff;
+    background-color: #ff4d4d;
+    border: 1px solid #ac1010;
+    border-bottom: 3px solid #ac1010;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    }
 
-@keyframes fadeIn {
-from {
-    opacity: 0;
-}
-to {
-    opacity: 1;
-}
-}
+    .reset-btn:hover {
+    background-color: #ff1a1a;
+    }
 
-@keyframes popIn {
-0% {
-    transform: scale(0);
-}
-50% {
-    transform: scale(1.2);
-}
-100% {
-    transform: scale(1);
-}
-}
+    @keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+    }
+
+    @keyframes popIn {
+    0% {
+        transform: scale(0);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
+    }
 
     .winning-cell {
         background: rgba(126, 255, 35, 0.1);
@@ -130,6 +130,7 @@ to {
     }
 
     .difficulty-btn {
+        font-family: 'Poppins', sans-serif;
         padding: 10px 20px;
         margin: 0 5px;
         font-size: 1rem;
@@ -146,15 +147,24 @@ to {
         background-color: #1a3566;
     }
 
-    .difficulty-btn.active {
-        background-color: #33b618;
-        border: 1px solid #1b680b;
-        border-bottom: 3px solid #1b680b;
+    .difficulty-btn.active[data-difficulty="easy"] {
+        background-color: #28a745;
+        border-color: #1e7e34;
+    }
+
+    .difficulty-btn.active[data-difficulty="medium"] {
+        background-color: #ffc107;
+        border-color: #d39e00;
+    }
+
+    .difficulty-btn.active[data-difficulty="hard"] {
+        background-color: #dc3545;
+        border-color: #c82333;
     }
 
     .difficulty-btn.secret {
-        background-color: #ff4444 !important;
-        border-color: #cc0000 !important;
+        background-color: #20c997 !important;
+        border-color: #1aa179 !important;
     }
     
 </style>
@@ -163,9 +173,9 @@ to {
 <div class="container">
     <h1>JOGO DA VELHA</h1>
     <div class="difficulty">
-        <button class="difficulty-btn" data-difficulty="easy">Fácil</button>
+        <button class="difficulty-btn active" data-difficulty="easy">Fácil</button>
         <button class="difficulty-btn" data-difficulty="medium">Médio</button>
-        <button class="difficulty-btn active" data-difficulty="hard">Difícil</button>
+        <button class="difficulty-btn" data-difficulty="hard">Difícil</button>
     </div>
     <div class="board">
         <div class="cell" data-index="0"></div>
@@ -358,26 +368,29 @@ statusText.textContent = `Vez do jogador ${currentPlayer}`;
 
     document.querySelectorAll('.difficulty-btn').forEach(button => {
         button.addEventListener('click', function() {
-            document.querySelectorAll('.difficulty-btn').forEach(btn => btn.classList.remove('active'));
+            const wasHardActive = document.querySelector('.difficulty-btn[data-difficulty="hard"]').classList.contains('active');
+            const isHardButton = this.dataset.difficulty === 'hard';
+            
+            document.querySelectorAll('.difficulty-btn').forEach(btn => {
+                btn.classList.remove('active', 'secret');
+            });
+            
             this.classList.add('active');
             aiDifficulty = this.dataset.difficulty;
+            
+            if (isHardButton) {
+                if (wasHardActive) {
+                    secretMode = !secretMode;
+                    this.classList.toggle('secret', secretMode);
+                } else {
+                    secretMode = false;
+                }
+            } else {
+                secretMode = false;
+            }
+            
             resetGame();
         });
-    });
-
-    document.querySelector('.difficulty-btn[data-difficulty="hard"]').addEventListener('click', function(e) {
-        const now = Date.now();
-        if (now - lastClickTime < 500) {
-            clickCount++;
-            if (clickCount === 2) {
-                secretMode = !secretMode;
-                this.classList.toggle('secret');
-                clickCount = 0;
-            }
-        } else {
-            clickCount = 1;
-        }
-        lastClickTime = now;
     });
 
     function makeAIMove() {
