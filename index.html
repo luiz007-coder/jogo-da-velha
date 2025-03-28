@@ -186,6 +186,8 @@
         height: 40px;
         background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%2300ff00" d="M12 2L2 22h20z"/></svg>');
         transform: translateX(-50%);
+        cursor: pointer;
+        pointer-events: auto;
     }
 
     .enemyShip {
@@ -227,35 +229,6 @@
         50% { opacity: 1; }
         100% { opacity: 0; }
     }
-
-    .mobile-controls {
-        display: none;
-        position: fixed;
-        bottom: 20px;
-        left: 0;
-        right: 0;
-        justify-content: space-between;
-        padding: 0 20px;
-        touch-action: manipulation;
-    }
-
-    .control-btn {
-        width: 60px;
-        height: 60px;
-        background: rgba(255, 255, 255, 0.3);
-        border-radius: 50%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 24px;
-        color: white;
-        user-select: none;
-        -webkit-tap-highlight-color: transparent;
-    }
-
-    #shootBtn {
-        background: rgba(255, 0, 0, 0.5);
-    }
     
 </style>
 </head>
@@ -280,11 +253,6 @@
     </div>
     <div class="status"></div>
     <button class="reset-btn">Reiniciar</button>
-    <div class="mobile-controls">
-        <div class="control-btn" id="leftBtn">←</div>
-        <div class="control-btn" id="shootBtn">⚡</div>
-        <div class="control-btn" id="rightBtn">→</div>
-    </div>
 </div>
 <script>
     const board = document.querySelector('.board');
@@ -299,8 +267,6 @@
     let secretMode = false;
     let clickCount = 0;
     let lastClickTime = 0;
-    let moveInterval;
-    let moveDirection = 0;
 
     const winningConditions = [
         [0, 1, 2], [3, 4, 5], [6, 7, 8],
@@ -515,8 +481,11 @@ statusText.textContent = `Vez do jogador ${currentPlayer}`;
 
     let devMessageShown = false;
 
+    document.getElementById('playerShip').addEventListener('click', shoot);
+
 function startSpaceInvaders() {
-    document.querySelector('.mobile-controls').style.display = 'flex';
+    const existingGame = document.getElementById('spaceInvaders');
+    if (existingGame) existingGame.remove();
     const container = document.createElement('div');
     container.id = 'spaceInvaders';
     container.innerHTML = `
@@ -526,6 +495,9 @@ function startSpaceInvaders() {
     document.body.appendChild(container);
     container.style.display = 'block';
     document.querySelector('.container').style.display = 'none';
+
+    const playerShip = document.getElementById('playerShip');
+    playerShip.addEventListener('click', shoot);
 
     let playerX = 50;
     let bullets = [];
@@ -623,14 +595,8 @@ function startSpaceInvaders() {
         setTimeout(() => {
             container.remove();
             document.querySelector('.container').style.display = 'block';
+            resetGame();
         }, 2000);
-
-        setTimeout(() => {
-            container.remove();
-            document.querySelector('.container').style.display = 'block';
-            document.querySelector('.mobile-controls').style.display = 'none';
-            gameActive = false;
-    }, 2000);
     }
 
     document.addEventListener('keydown', (e) => {
@@ -649,49 +615,6 @@ document.querySelector('h1').addEventListener('click', () => {
         startSpaceInvaders();
     }
     setTimeout(() => clickCount = 0, 1000);
-});
-
-function startMove(direction) {
-    moveDirection = direction;
-    moveInterval = setInterval(() => {
-        if(!gameActive) return;
-        playerX = Math.min(Math.max(playerX + (direction * 5), 5, 95));
-        document.getElementById('playerShip').style.left = `${playerX}%`;
-    }, 50);
-}
-
-function stopMove() {
-    clearInterval(moveInterval);
-    moveDirection = 0;
-}
-
-document.querySelector('#leftBtn').addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    startMove(-1);
-});
-document.querySelector('#rightBtn').addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    startMove(1);
-});
-document.querySelector('#leftBtn').addEventListener('touchend', stopMove);
-document.querySelector('#rightBtn').addEventListener('touchend', stopMove);
-document.querySelector('#shootBtn').addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    shoot();
-});
-
-container.addEventListener('click', () => {
-    if(score >= 15 || !gameActive) {
-        container.remove();
-        document.querySelector('.container').style.display = 'block';
-        document.querySelector('.mobile-controls').style.display = 'none';
-        gameActive = false;
-    }
-});
-
-resetBtn.addEventListener('click', () => {
-    resetGame();
-    document.querySelector('.mobile-controls').style.display = 'none';
 });
 
     resetGame();
