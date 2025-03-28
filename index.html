@@ -59,10 +59,6 @@
     transition: background-color 0.3s, transform 0.2s;
     }
 
-    .cell:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-    }
-
     .cell.X::before {
     content: 'X';
     color: #ff4d4d;
@@ -192,7 +188,6 @@
         background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%2300ff00" d="M12 2L2 22h20z"/></svg>');
         transform: translateX(-50%);
         cursor: pointer;
-        pointer-events: auto;
     }
 
     .enemyShip {
@@ -260,7 +255,6 @@
     <button class="reset-btn">Reiniciar</button>
 </div>
 <script>
-    const board = document.querySelector('.board');
     const cells = document.querySelectorAll('.cell');
     const statusText = document.querySelector('.status');
     const resetBtn = document.querySelector('.reset-btn');
@@ -271,7 +265,6 @@
     let aiDifficulty = 'easy';
     let secretMode = false;
     let clickCount = 0;
-    let lastClickTime = 0;
     let gameRunning = false;
     let spawnInterval;
 
@@ -419,23 +412,6 @@ statusText.textContent = `Vez do jogador ${currentPlayer}`;
         return null;
     }
 
-    function makeAIMove() {
-        if (!gameActive) return;
-        
-        let move;
-        switch (aiDifficulty) {
-            case 'easy': move = easyAI(); break;
-            case 'medium': move = mediumAI(); break;
-            case 'hard': move = hardAI(); break;
-        }
-
-        if (gameState[move] === '') {
-            gameState[move] = 'O';
-            cells[move].classList.add('O');
-            checkForWinner();
-        }
-    }
-
     document.querySelectorAll('.difficulty-btn').forEach(button => {
         button.addEventListener('click', function() {
             const wasHardActive = document.querySelector('.difficulty-btn[data-difficulty="hard"]').classList.contains('active');
@@ -489,6 +465,37 @@ statusText.textContent = `Vez do jogador ${currentPlayer}`;
     let devMessageShown = false;
 
 function startSpaceInvaders() {
+    playerShip.removeEventListener('touchend', handleShoot);
+    container.removeEventListener('touchend', handleShoot);
+
+    let touchStartTime = 0;
+    let touchMoved = false;
+
+    container.addEventListener('touchstart', function(e) {
+            touchStartTime = Date.now();
+            touchMoved = false;
+            e.preventDefault();
+        }, {passive: false});
+
+        container.addEventListener('touchmove', function(e) {
+            touchMoved = true;
+            if (!gameRunning) return;
+            
+            const touch = e.touches[0];
+            const deltaX = touch.clientX - touchStartX;
+            playerX = Math.min(Math.max(playerX + (deltaX * 0.5), 5), 95);
+            playerShip.style.left = `${playerX}%`;
+            touchStartX = touch.clientX;
+            e.preventDefault();
+        }, {passive: false});
+
+        container.addEventListener('touchend', function(e) {
+            if (!touchMoved && (Date.now() - touchStartTime < 200)) {
+                handleShoot();
+            }
+            e.preventDefault();
+        }, {passive: false});
+
     const existingGame = document.getElementById('spaceInvaders');
         if (existingGame) existingGame.remove();
 
@@ -508,11 +515,29 @@ function startSpaceInvaders() {
     
     const playerShip = document.getElementById('playerShip');
 
+    let touchStartX = 0;
+
+    container.addEventListener('touchstart', (e) => {
+        touchStartX = e.touches[0].clientX;
+        handleShoot();
+        e.preventDefault();
+    }, { passive: false });
+
+    container.addEventListener('touchmove', (e) => {
+        if (!gameRunning) return;
+        
+        const touch = e.touches[0];
+        const deltaX = touch.clientX - touchStartX;
+        playerX = Math.min(Math.max(playerX + (deltaX * 0.5), 5), 95);
+        playerShip.style.left = `${playerX}%`;
+        touchStartX = touch.clientX;
+        e.preventDefault();
+    }, { passive: false });
+
         let playerX = 50;
         let bullets = [];
         let enemies = [];
         let score = 0;
-        let canShoot = true;
 
         function handleShoot() {
             if (!gameRunning) return;
@@ -525,27 +550,6 @@ function startSpaceInvaders() {
         }
 
         playerShip.addEventListener('click', handleShoot);
-        playerShip.addEventListener('touchstart', function(e) {
-            e.preventDefault();
-            handleShoot();
-        });
-
-        let touchStartX = 0;
-        playerShip.addEventListener('touchstart', function(e) {
-            touchStartX = e.touches[0].clientX;
-            e.preventDefault();
-        });
-
-        playerShip.addEventListener('touchmove', function(e) {
-            if (!gameRunning) return;
-            
-            const touch = e.touches[0];
-            const deltaX = touch.clientX - touchStartX;
-            playerX = Math.min(Math.max(playerX + (deltaX * 0.5), 5), 95);
-            playerShip.style.left = `${playerX}%`;
-            touchStartX = touch.clientX;
-            e.preventDefault();
-        });
 
         function movePlayer(e) {
             if (!gameRunning) return;
@@ -652,12 +656,6 @@ function startSpaceInvaders() {
             }, 2000);
         }
 
-    document.addEventListener('keydown', (e) => {
-        if(['ArrowLeft', 'ArrowRight'].includes(e.key)) movePlayer(e);
-        if(e.code === 'Space') shoot();
-    });
-
-    setInterval(spawnEnemy, 2000);
     gameLoop();
 }
 
