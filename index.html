@@ -151,6 +151,11 @@ to {
         border: 1px solid #1b680b;
         border-bottom: 3px solid #1b680b;
     }
+
+    .difficulty-btn.secret {
+        background-color: #ff4444 !important;
+        border-color: #cc0000 !important;
+    }
     
 </style>
 </head>
@@ -186,6 +191,9 @@ to {
     let gameState = ['', '', '', '', '', '', '', '', ''];
     let gameActive = true;
     let aiDifficulty = 'hard';
+    let secretMode = false;
+    let clickCount = 0;
+    let lastClickTime = 0;
 
     const winningConditions = [
         [0, 1, 2], [3, 4, 5], [6, 7, 8],
@@ -200,13 +208,13 @@ const winningCells = (combination) => {
     };
 
     function handleCellClick(event) {
-        if (currentPlayer !== 'X' || !gameActive) return;
+        if (!gameActive || currentPlayer !== 'X' || event.target.classList.contains('disabled')) return;
         
         const clickedCell = event.target;
         const clickedCellIndex = parseInt(clickedCell.getAttribute('data-index'));
 
         if (gameState[clickedCellIndex] !== '') return;
-
+        
         gameState[clickedCellIndex] = 'X';
         clickedCell.classList.add('X');
         checkForWinner();
@@ -246,15 +254,15 @@ function checkForWinner() {
         }
     }
 
-function resetGame() {
-gameState = ['', '', '', '', '', '', '', '', ''];
-gameActive = true;
-currentPlayer = 'X';
-statusText.textContent = `Vez do jogador ${currentPlayer}`;
-cells.forEach(cell => {
-            cell.classList.remove('X', 'O', 'winning-cell');
+    function resetGame() {
+        gameState = ['', '', '', '', '', '', '', '', ''];
+        gameActive = true;
+        currentPlayer = 'X';
+        statusText.textContent = `Vez do jogador ${currentPlayer}`;
+        cells.forEach(cell => {
+            cell.classList.remove('X', 'O', 'winning-cell', 'disabled');
         });
-}
+    }
 
 cells.forEach(cell => {
 cell.addEventListener('click', handleCellClick);
@@ -290,8 +298,8 @@ statusText.textContent = `Vez do jogador ${currentPlayer}`;
 
     function minimax(state, depth, isMaximizing) {
         const winner = checkWinner(state);
-        if (winner === 'O') return { score: 10 - depth };
-        if (winner === 'X') return { score: depth - 10 };
+        if (winner === 'O') return { score: 100 - depth };
+        if (winner === 'X') return { score: depth - 100 };
         if (state.every(cell => cell !== '')) return { score: 0 };
 
         let best = { score: isMaximizing ? -Infinity : Infinity };
@@ -302,9 +310,16 @@ statusText.textContent = `Vez do jogador ${currentPlayer}`;
             const result = minimax(state, depth + 1, !isMaximizing);
             state[i] = '';
 
-            if ((isMaximizing && result.score > best.score) ||
-                (!isMaximizing && result.score < best.score)) {
-                best = { score: result.score, move: i };
+            if (isMaximizing) {
+                if (result.score > best.score || 
+                   (result.score === best.score && depth % 2 === 0)) {
+                    best = { score: result.score, move: i };
+                }
+            } else {
+                if (result.score < best.score || 
+                   (result.score === best.score && depth % 2 === 0)) {
+                    best = { score: result.score, move: i };
+                }
             }
         }
         return best;
@@ -317,7 +332,9 @@ statusText.textContent = `Vez do jogador ${currentPlayer}`;
     function checkWinner(state) {
         for (const condition of winningConditions) {
             const [a, b, c] = condition;
-            if (state[a] && state[a] === state[b] && state[a] === state[c]) return state[a];
+            if (state[a] && state[a] === state[b] && state[a] === state[c]) {
+                return state[a];
+            }
         }
         return null;
     }
@@ -348,6 +365,43 @@ statusText.textContent = `Vez do jogador ${currentPlayer}`;
         });
     });
 
+    document.querySelector('.difficulty-btn[data-difficulty="hard"]').addEventListener('click', function(e) {
+        const now = Date.now();
+        if (now - lastClickTime < 500) {
+            clickCount++;
+            if (clickCount === 2) {
+                secretMode = !secretMode;
+                this.classList.toggle('secret');
+                clickCount = 0;
+            }
+        } else {
+            clickCount = 1;
+        }
+        lastClickTime = now;
+    });
+
+    function makeAIMove() {
+        if (!gameActive) return;
+        
+        let move;
+        if (secretMode && aiDifficulty === 'hard') {
+            move = easyAI();
+        } else {
+            switch (aiDifficulty) {
+                case 'easy': move = easyAI(); break;
+                case 'medium': move = mediumAI(); break;
+                case 'hard': move = hardAI(); break;
+            }
+        }
+
+        if (gameState[move] === '') {
+            gameState[move] = 'O';
+            cells[move].classList.add('O');
+            checkForWinner();
+        }
+        
+        cells.forEach(c => c.classList.remove('disabled'));
+    }
 
     resetGame();
 </script>
