@@ -486,8 +486,6 @@ statusText.textContent = `Vez do jogador ${currentPlayer}`;
 
     let devMessageShown = false;
 
-    document.getElementById('playerShip').addEventListener('click', shoot);
-
 function startSpaceInvaders() {
     const existingGame = document.getElementById('spaceInvaders');
     if (existingGame) existingGame.remove();
@@ -498,9 +496,10 @@ function startSpaceInvaders() {
         <div id="gameScore">0</div>
     `;
     document.body.appendChild(container);
+
     container.style.display = 'block';
     document.querySelector('.container').style.display = 'none';
-
+    
     const playerShip = document.getElementById('playerShip');
     playerShip.addEventListener('click', shoot);
 
