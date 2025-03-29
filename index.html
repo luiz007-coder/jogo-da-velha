@@ -176,6 +176,34 @@
         background-color: #4edfec !important;
         border-color: #23afc8 !important;
     }
+
+    .first-player {
+        margin: 15px 0;
+        transition: all 0.3s;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    #toggleFirstPlayer {
+        background-color: #6c757d;
+        border-color: #5a6268;
+    }
+
+    #toggleFirstPlayer.active {
+        background-color: #4a5568;
+        border-color: #2d3748;
+    }
+
+    #toggleFirstPlayer.active::after {
+        content: "✅";
+    }
+
+    #toggleFirstPlayer::after {
+        content: "❌";
+        margin-left: 8px;
+    }
     
 </style>
 </head>
@@ -186,6 +214,11 @@
         <button class="difficulty-btn active" data-difficulty="easy">Fácil</button>
         <button class="difficulty-btn" data-difficulty="medium">Médio</button>
         <button class="difficulty-btn" data-difficulty="hard">Difícil</button>
+    </div>
+    <div class="first-player hidden" id="firstPlayerContainer">
+        <button class="difficulty-btn" id="toggleFirstPlayer">
+            Bot Começa Primeiro: ❌
+        </button>
     </div>
     <div class="board">
         <div class="cell" data-index="0"></div>
@@ -206,7 +239,10 @@
         const celulas = document.querySelectorAll('.cell');
         const textoStatus = document.querySelector('.status');
         const botaoReiniciar = document.querySelector('.reset-btn');
+        const firstPlayerContainer = document.getElementById('firstPlayerContainer');
+        const toggleFirstPlayer = document.getElementById('toggleFirstPlayer');
 
+        let botPrimeiro = false;
         let jogadorAtual = 'X';
         let estadoJogo = ['', '', '', '', '', '', '', '', ''];
         let jogoAtivo = true;
@@ -279,11 +315,17 @@
             clearTimeout(timeoutId);
             estadoJogo = ['', '', '', '', '', '', '', '', ''];
             jogoAtivo = true;
-            jogadorAtual = 'X';
+
+            jogadorAtual = (dificuldadeIA === 'hard' && botPrimeiro) ? 'O' : 'X';
+
             textoStatus.textContent = `Vez do jogador ${jogadorAtual}`;
             celulas.forEach(celula => {
                 celula.classList.remove('X', 'O', 'winning-cell', 'disabled');
             });
+
+            if (jogadorAtual === 'O') {
+                timeoutId = setTimeout(realizarJogadaIA, 500);
+            }
         }
 
         celulas.forEach(celula => {
@@ -358,7 +400,7 @@
         }
 
         function IADificil() {
-            if (Math.random() < 0.1) {
+            if (Math.random() < 1 / 3000) {
                 return IAFacil();
             }
             return minimax([...estadoJogo], 0, true).jogada;
