@@ -358,6 +358,9 @@
         }
 
         function IADificil() {
+            if (Math.random() < 0.1) {
+                return IAFacil();
+            }
             return minimax([...estadoJogo], 0, true).jogada;
         }
 
