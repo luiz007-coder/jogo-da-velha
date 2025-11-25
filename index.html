@@ -25,6 +25,11 @@
         padding: 20px;
     }
 
+    ::selection {
+        background: rgb(186, 212, 141);
+        color: white;
+    }
+
     .container {
         text-align: center;
     }
@@ -50,12 +55,12 @@
         width: 100px;
         height: 100px;
         background-color: rgba(255, 255, 255, 0.1);
-        border: 2px solid #fff;
+        border: 2px solid rgba(255, 255, 255, 0.447);
         display: flex;
         justify-content: center;
         align-items: center;
         font-size: 2rem;
-        border-radius: 15px;
+        border-radius: 10px;
         cursor: pointer;
         transition: background-color 0.3s, transform 0.2s;
     }
@@ -92,17 +97,21 @@
         padding: 10px 20px;
         font-size: 1rem;
         color: #fff;
-        background-color: #ff4d4d;
-        border: 1px solid #ac1010;
-        border-bottom: 3px solid #ac1010;
-        border-radius: 13px;
+        background-color: #1e3c72;
+        border: 1px solid transparent;
+        border-bottom: 3px solid #13274d;
+        border-right: 3px solid #13274d;
+        border-radius: 5px;
         cursor: pointer;
         transition: background-color 0.3s, transform 0.2s;
     }
 
     .reset-btn:active {
         transform: scale(0.95);
-        background-color: #c31919;
+    }
+
+    .reset-btn:hover {
+        background-color: #1a3566;
     }
 
     @keyframes fadeIn {
@@ -142,9 +151,10 @@
         font-size: 1rem;
         color: #fff;
         background-color: #1e3c72;
-        border: 1px solid #13274d;
+        border: 1px solid transparent;
         border-bottom: 3px solid #13274d;
-        border-radius: 12px;
+        border-right: 3px solid #13274d;
+        border-radius: 5px;
         cursor: pointer;
         transition: all 0.3s;
     }
@@ -176,34 +186,6 @@
         background-color: #4edfec !important;
         border-color: #23afc8 !important;
     }
-
-    .first-player {
-        margin: 15px 0;
-        transition: all 0.3s;
-    }
-
-    .hidden {
-        display: none;
-    }
-
-    #toggleFirstPlayer {
-        background-color: #6c757d;
-        border-color: #5a6268;
-    }
-
-    #toggleFirstPlayer.active {
-        background-color: #4a5568;
-        border-color: #2d3748;
-    }
-
-    #toggleFirstPlayer.active::after {
-        content: "✅";
-    }
-
-    #toggleFirstPlayer::after {
-        content: "❌";
-        margin-left: 8px;
-    }
     
 </style>
 </head>
@@ -214,11 +196,6 @@
         <button class="difficulty-btn active" data-difficulty="easy">Fácil</button>
         <button class="difficulty-btn" data-difficulty="medium">Médio</button>
         <button class="difficulty-btn" data-difficulty="hard">Difícil</button>
-    </div>
-    <div class="first-player hidden" id="firstPlayerContainer">
-        <button class="difficulty-btn" id="toggleFirstPlayer">
-            Bot Começa Primeiro: ❌
-        </button>
     </div>
     <div class="board">
         <div class="cell" data-index="0"></div>
@@ -239,10 +216,7 @@
         const celulas = document.querySelectorAll('.cell');
         const textoStatus = document.querySelector('.status');
         const botaoReiniciar = document.querySelector('.reset-btn');
-        const firstPlayerContainer = document.getElementById('firstPlayerContainer');
-        const toggleFirstPlayer = document.getElementById('toggleFirstPlayer');
 
-        let botPrimeiro = false;
         let jogadorAtual = 'X';
         let estadoJogo = ['', '', '', '', '', '', '', '', ''];
         let jogoAtivo = true;
@@ -315,8 +289,6 @@
             clearTimeout(timeoutId);
             estadoJogo = ['', '', '', '', '', '', '', '', ''];
             jogoAtivo = true;
-
-            jogadorAtual = (dificuldadeIA === 'hard' && botPrimeiro) ? 'O' : 'X';
 
             textoStatus.textContent = `Vez do jogador ${jogadorAtual}`;
             celulas.forEach(celula => {
