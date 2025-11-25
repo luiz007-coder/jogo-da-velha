@@ -7,7 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
-        * {
+    * {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
@@ -41,6 +41,70 @@
         text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
     }
 
+    .topics-container-wrapper {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 10px;
+        width: 100%;
+    }
+
+    .topics-container {
+        display: inline-flex;
+        gap: 6px;
+        margin-bottom: 5px;
+        flex-wrap: wrap;
+        background: rgba(26, 42, 87, 0.3);
+        padding: 4px;
+        border-radius: 27px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        width: auto;
+        max-width: 100%;
+    }
+
+    .topic-btn {
+        background: transparent;
+        border: none;
+        border-radius: 20px;
+        padding: 8px 16px;
+        color: rgba(255, 255, 255, 0.7);
+        font-family: 'Poppins', sans-serif;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+    }
+
+    .topic-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+    }
+
+    .topic-btn.active {
+        background: linear-gradient(135deg, #045199, #1a6fb3);
+        color: white;
+        box-shadow: 0 2px 8px rgba(4, 81, 153, 0.4);
+    }
+
+    .topic-btn.active[data-difficulty="easy"] {
+        background: linear-gradient(135deg, #28a745, #34ce57);
+    }
+
+    .topic-btn.active[data-difficulty="medium"] {
+        background: linear-gradient(135deg, #ffc107, #ffd654);
+    }
+
+    .topic-btn.active[data-difficulty="hard"] {
+        background: linear-gradient(135deg, #dc3545, #e95c6a);
+    }
+
+    .topic-btn.secret {
+        background: linear-gradient(135deg, #4edfec, #6ae6f1) !important;
+    }
+
     .board {
         font-family: 'Poppins', sans-serif;
         display: grid;
@@ -60,7 +124,7 @@
         justify-content: center;
         align-items: center;
         font-size: 2rem;
-        border-radius: 10px;
+        border-radius: 12px;
         cursor: pointer;
         transition: background-color 0.3s, transform 0.2s;
     }
@@ -70,18 +134,26 @@
     }
 
     .cell.X::before {
-        content: "\f00d";
-        font-family: "Font Awesome 6 Free";
-        font-weight: 900;
-        color: #48ff00;
+        content: "";
+        position: absolute;
+        width: 60px;
+        height: 60px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%239146FF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 2H3v16h5v4l4-4h5l4-4V2zm-10 9V7m5 4V7'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: contain;
         animation: popIn 0.3s ease-in-out;
     }
 
     .cell.O::before {
-        content: "\f10c";
-        font-family: "Font Awesome 6 Free";
-        font-weight: 400;
-        color: #ff2929;
+        content: "";
+        position: absolute;
+        width: 60px;
+        height: 60px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%231DA1F2' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: contain;
         animation: popIn 0.3s ease-in-out;
     }
 
@@ -90,6 +162,26 @@
         font-size: 1.5rem;
         margin: 20px 0;
         animation: fadeIn 1s ease-in-out;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .status-icon {
+        width: 30px;
+        height: 30px;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: contain;
+    }
+
+    .status-icon.X {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%239146FF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 2H3v16h5v4l4-4h5l4-4V2zm-10 9V7m5 4V7'/%3E%3C/svg%3E");
+    }
+
+    .status-icon.O {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%231DA1F2' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z'/%3E%3C/svg%3E");
     }
 
     .reset-btn {
@@ -139,63 +231,17 @@
         background: rgba(126, 255, 35, 0.1);
         border-color: rgb(131, 255, 36);
     }
-
-    .difficulty {
-        margin-bottom: 20px;
-    }
-
-    .difficulty-btn {
-        font-family: 'Poppins', sans-serif;
-        padding: 8px 18px;
-        margin: 0 5px;
-        font-size: 1rem;
-        color: #fff;
-        background-color: #1e3c72;
-        border: 1px solid transparent;
-        border-bottom: 3px solid #13274d;
-        border-right: 3px solid #13274d;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: all 0.3s;
-    }
-
-    .difficulty-btn:hover {
-        background-color: #1a3566;
-    }
-
-    .difficulty-btn:active {
-        transform: scale(0.95);
-    }
-
-    .difficulty-btn.active[data-difficulty="easy"] {
-        background-color: #28a745;
-        border-color: #1e7e34;
-    }
-
-    .difficulty-btn.active[data-difficulty="medium"] {
-        background-color: #ffc107;
-        border-color: #d39e00;
-    }
-
-    .difficulty-btn.active[data-difficulty="hard"] {
-        background-color: #dc3545;
-        border-color: #c82333;
-    }
-
-    .difficulty-btn.secret {
-        background-color: #4edfec !important;
-        border-color: #23afc8 !important;
-    }
-    
 </style>
 </head>
 <body>
 <div class="container">
     <h1>JOGO DA VELHA</h1>
-    <div class="difficulty">
-        <button class="difficulty-btn active" data-difficulty="easy">Fácil</button>
-        <button class="difficulty-btn" data-difficulty="medium">Médio</button>
-        <button class="difficulty-btn" data-difficulty="hard">Difícil</button>
+    <div class="topics-container-wrapper">
+        <div class="topics-container">
+            <button class="topic-btn active" data-difficulty="easy">Fácil</button>
+            <button class="topic-btn" data-difficulty="medium">Médio</button>
+            <button class="topic-btn" data-difficulty="hard">Difícil</button>
+        </div>
     </div>
     <div class="board">
         <div class="cell" data-index="0"></div>
@@ -212,223 +258,228 @@
     <button class="reset-btn">Reiniciar</button>
 </div>
 <script>
-        const tabuleiro = document.querySelector('.board');
-        const celulas = document.querySelectorAll('.cell');
-        const textoStatus = document.querySelector('.status');
-        const botaoReiniciar = document.querySelector('.reset-btn');
+    const tabuleiro = document.querySelector('.board');
+    const celulas = document.querySelectorAll('.cell');
+    const textoStatus = document.querySelector('.status');
+    const botaoReiniciar = document.querySelector('.reset-btn');
 
-        let jogadorAtual = 'X';
-        let estadoJogo = ['', '', '', '', '', '', '', '', ''];
-        let jogoAtivo = true;
-        let dificuldadeIA = 'easy';
-        let modoSecreto = false;
-        let contagemCliques = 0;
-        let ultimoTempoClique = 0;
-        let timeoutId;
+    let jogadorAtual = 'X';
+    let estadoJogo = ['', '', '', '', '', '', '', '', ''];
+    let jogoAtivo = true;
+    let dificuldadeIA = 'easy';
+    let modoSecreto = false;
+    let contagemCliques = 0;
+    let ultimoTempoClique = 0;
+    let timeoutId;
 
-        const condicoesVitoria = [
-            [0, 1, 2], [3, 4, 5], [6, 7, 8],
-            [0, 3, 6], [1, 4, 7], [2, 5, 8],
-            [0, 4, 8], [2, 4, 6]
-        ];
+    const condicoesVitoria = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8],
+        [0, 3, 6], [1, 4, 7], [2, 5, 8],
+        [0, 4, 8], [2, 4, 6]
+    ];
 
-        const celulasVencedoras = (combinacao) => {
-            combinacao.forEach(index => {
-                celulas[index].classList.add('winning-cell');
-            });
-        };
+    const celulasVencedoras = (combinacao) => {
+        combinacao.forEach(index => {
+            celulas[index].classList.add('winning-cell');
+        });
+    };
 
-        function tratarCliqueCelula(evento) {
-            if (!jogoAtivo || jogadorAtual !== 'X' || evento.target.classList.contains('disabled')) return;
-            
-            const celulaClicada = evento.target;
-            const indiceCelulaClicada = parseInt(celulaClicada.getAttribute('data-index'));
+    function atualizarStatus() {
+        textoStatus.innerHTML = `Vez do jogador <div class="status-icon ${jogadorAtual}"></div>`;
+    }
 
-            if (estadoJogo[indiceCelulaClicada] !== '') return;
-            
-            estadoJogo[indiceCelulaClicada] = 'X';
-            celulaClicada.classList.add('X');
-            verificarVencedor();
+    function atualizarStatusVitoria(vencedor) {
+        textoStatus.innerHTML = `Vitória! <div class="status-icon ${vencedor}"></div>`;
+    }
+
+    function tratarCliqueCelula(evento) {
+        if (!jogoAtivo || jogadorAtual !== 'X' || evento.target.classList.contains('disabled')) return;
+        
+        const celulaClicada = evento.target;
+        const indiceCelulaClicada = parseInt(celulaClicada.getAttribute('data-index'));
+
+        if (estadoJogo[indiceCelulaClicada] !== '') return;
+        
+        estadoJogo[indiceCelulaClicada] = 'X';
+        celulaClicada.classList.add('X');
+        verificarVencedor();
+    }
+
+    function verificarVencedor() {
+        let vitoriaRodada = false;
+        let combinacaoVencedora = null;
+
+        for (const condicao of condicoesVitoria) {
+            const [a, b, c] = condicao;
+            if (estadoJogo[a] && estadoJogo[a] === estadoJogo[b] && estadoJogo[a] === estadoJogo[c]) {
+                vitoriaRodada = true;
+                combinacaoVencedora = condicao;
+                break;
+            }
         }
 
-        function verificarVencedor() {
-            let vitoriaRodada = false;
-            let combinacaoVencedora = null;
+        if (vitoriaRodada) {
+            celulasVencedoras(combinacaoVencedora);
+            atualizarStatusVitoria(jogadorAtual);
+            jogoAtivo = false;
+            return;
+        }
 
-            for (const condicao of condicoesVitoria) {
-                const [a, b, c] = condicao;
-                if (estadoJogo[a] && estadoJogo[a] === estadoJogo[b] && estadoJogo[a] === estadoJogo[c]) {
-                    vitoriaRodada = true;
-                    combinacaoVencedora = condicao;
-                    break;
+        if (!estadoJogo.includes('')) {
+            textoStatus.textContent = 'Empate!';
+            jogoAtivo = false;
+            return;
+        }
+
+        jogadorAtual = jogadorAtual === 'X' ? 'O' : 'X';
+        atualizarStatus();
+
+        if (jogoAtivo && jogadorAtual === 'O') {
+            timeoutId = setTimeout(realizarJogadaIA, 500);
+        }
+    }
+
+    function reiniciarJogo() {
+        clearTimeout(timeoutId);
+        estadoJogo = ['', '', '', '', '', '', '', '', ''];
+        jogoAtivo = true;
+        jogadorAtual = 'X';
+
+        atualizarStatus();
+        celulas.forEach(celula => {
+            celula.classList.remove('X', 'O', 'winning-cell', 'disabled');
+        });
+    }
+
+    celulas.forEach(celula => {
+        celula.addEventListener('click', tratarCliqueCelula);
+    });
+
+    botaoReiniciar.addEventListener('click', reiniciarJogo);
+
+    atualizarStatus();
+
+    function IAFacil() {
+        const celulasVazias = estadoJogo.reduce((acc, celula, index) => {
+            if (celula === '') acc.push(index);
+            return acc;
+        }, []);
+        return celulasVazias[Math.floor(Math.random() * celulasVazias.length)];
+    }
+
+    function IAMedio() {
+        for (const condicao of condicoesVitoria) {
+            const [a, b, c] = condicao;
+            if (estadoJogo[a] === 'O' && estadoJogo[a] === estadoJogo[b] && estadoJogo[c] === '') return c;
+            if (estadoJogo[a] === 'O' && estadoJogo[c] === 'O' && estadoJogo[b] === '') return b;
+            if (estadoJogo[b] === 'O' && estadoJogo[c] === 'O' && estadoJogo[a] === '') return a;
+        }
+        for (const condicao of condicoesVitoria) {
+            const [a, b, c] = condicao;
+            if (estadoJogo[a] === 'X' && estadoJogo[a] === estadoJogo[b] && estadoJogo[c] === '') return c;
+            if (estadoJogo[a] === 'X' && estadoJogo[c] === 'X' && estadoJogo[b] === '') return b;
+            if (estadoJogo[b] === 'X' && estadoJogo[c] === 'X' && estadoJogo[a] === '') return a;
+        }
+        return IAFacil();
+    }
+
+    function minimax(estado, profundidade, estaMaximizando) {
+        const vencedor = verificarVencedorEstado(estado);
+        if (vencedor === 'O') return { pontuacao: 100 - profundidade };
+        if (vencedor === 'X') return { pontuacao: profundidade - 100 };
+        if (estado.every(celula => celula !== '')) return { pontuacao: 0 };
+
+        let melhor = { pontuacao: estaMaximizando ? -Infinity : Infinity };
+        const prioridadeJogadas = [4, 0, 2, 6, 8, 1, 3, 5, 7];
+
+        for (const i of prioridadeJogadas) {
+            if (estado[i] !== '') continue;
+            
+            estado[i] = estaMaximizando ? 'O' : 'X';
+            const resultado = minimax(estado, profundidade + 1, !estaMaximizando);
+            estado[i] = '';
+
+            if (estaMaximizando) {
+                if (resultado.pontuacao > melhor.pontuacao) {
+                    melhor = { pontuacao: resultado.pontuacao, jogada: i };
+                }
+            } else {
+                if (resultado.pontuacao < melhor.pontuacao) {
+                    melhor = { pontuacao: resultado.pontuacao, jogada: i };
                 }
             }
+        }
+        return melhor;
+    }
 
-            if (vitoriaRodada) {
-                celulasVencedoras(combinacaoVencedora);
-                textoStatus.textContent = `Vitória do ${jogadorAtual}!`;
-                jogoAtivo = false;
-                return;
-            }
-
-            if (!estadoJogo.includes('')) {
-                textoStatus.textContent = 'Empate!';
-                jogoAtivo = false;
-                return;
-            }
-
-            jogadorAtual = jogadorAtual === 'X' ? 'O' : 'X';
-            textoStatus.textContent = `Vez do jogador ${jogadorAtual}`;
-
-            if (jogoAtivo && jogadorAtual === 'O') {
-                timeoutId = setTimeout(realizarJogadaIA, 500);
+    function verificarVencedorEstado(estado) {
+        for (const condicao of condicoesVitoria) {
+            const [a, b, c] = condicao;
+            if (estado[a] && estado[a] === estado[b] && estado[a] === estado[c]) {
+                return estado[a];
             }
         }
+        return null;
+    }
 
-        function reiniciarJogo() {
-            clearTimeout(timeoutId);
-            estadoJogo = ['', '', '', '', '', '', '', '', ''];
-            jogoAtivo = true;
-
-            textoStatus.textContent = `Vez do jogador ${jogadorAtual}`;
-            celulas.forEach(celula => {
-                celula.classList.remove('X', 'O', 'winning-cell', 'disabled');
-            });
-
-            if (jogadorAtual === 'O') {
-                timeoutId = setTimeout(realizarJogadaIA, 500);
-            }
-        }
-
-        celulas.forEach(celula => {
-            celula.addEventListener('click', tratarCliqueCelula);
-        });
-
-        botaoReiniciar.addEventListener('click', reiniciarJogo);
-
-        textoStatus.textContent = `Vez do jogador ${jogadorAtual}`;
-
-        function IAFacil() {
-            const celulasVazias = estadoJogo.reduce((acc, celula, index) => {
-                if (celula === '') acc.push(index);
-                return acc;
-            }, []);
-            return celulasVazias[Math.floor(Math.random() * celulasVazias.length)];
-        }
-
-        function IAMedio() {
-            for (const condicao of condicoesVitoria) {
-                const [a, b, c] = condicao;
-                if (estadoJogo[a] === 'O' && estadoJogo[a] === estadoJogo[b] && estadoJogo[c] === '') return c;
-                if (estadoJogo[a] === 'O' && estadoJogo[c] === 'O' && estadoJogo[b] === '') return b;
-                if (estadoJogo[b] === 'O' && estadoJogo[c] === 'O' && estadoJogo[a] === '') return a;
-            }
-            for (const condicao of condicoesVitoria) {
-                const [a, b, c] = condicao;
-                if (estadoJogo[a] === 'X' && estadoJogo[a] === estadoJogo[b] && estadoJogo[c] === '') return c;
-                if (estadoJogo[a] === 'X' && estadoJogo[c] === 'X' && estadoJogo[b] === '') return b;
-                if (estadoJogo[b] === 'X' && estadoJogo[c] === 'X' && estadoJogo[a] === '') return a;
-            }
+    function IADificil() {
+        if (Math.random() < 1 / 35000) {
             return IAFacil();
         }
+        return minimax([...estadoJogo], 0, true).jogada;
+    }
 
-        function minimax(estado, profundidade, estaMaximizando) {
-            const vencedor = verificarVencedorEstado(estado);
-            if (vencedor === 'O') return { pontuacao: 100 - profundidade };
-            if (vencedor === 'X') return { pontuacao: profundidade - 100 };
-            if (estado.every(celula => celula !== '')) return { pontuacao: 0 };
-
-            let melhor = { pontuacao: estaMaximizando ? -Infinity : Infinity };
-            const prioridadeJogadas = [4, 0, 2, 6, 8, 1, 3, 5, 7];
-
-            for (const i of prioridadeJogadas) {
-                if (estado[i] !== '') continue;
-                
-                estado[i] = estaMaximizando ? 'O' : 'X';
-                const resultado = minimax(estado, profundidade + 1, !estaMaximizando);
-                estado[i] = '';
-
-                if (estaMaximizando) {
-                    if (resultado.pontuacao > melhor.pontuacao) {
-                        melhor = { pontuacao: resultado.pontuacao, jogada: i };
-                    }
-                } else {
-                    if (resultado.pontuacao < melhor.pontuacao) {
-                        melhor = { pontuacao: resultado.pontuacao, jogada: i };
-                    }
-                }
+    function realizarJogadaIA() {
+        if (!jogoAtivo) return;
+        
+        let jogada;
+        if (modoSecreto && dificuldadeIA === 'hard') {
+            jogada = IAFacil();
+        } else {
+            switch (dificuldadeIA) {
+                case 'easy': jogada = IAFacil(); break;
+                case 'medium': jogada = IAMedio(); break;
+                case 'hard': jogada = IADificil(); break;
             }
-            return melhor;
         }
 
-        function verificarVencedorEstado(estado) {
-            for (const condicao of condicoesVitoria) {
-                const [a, b, c] = condicao;
-                if (estado[a] && estado[a] === estado[b] && estado[a] === estado[c]) {
-                    return estado[a];
-                }
-            }
-            return null;
+        if (estadoJogo[jogada] === '') {
+            estadoJogo[jogada] = 'O';
+            celulas[jogada].classList.add('O');
+            verificarVencedor();
         }
+        
+        celulas.forEach(c => c.classList.remove('disabled'));
+    }
 
-        function IADificil() {
-            if (Math.random() < 1 / 3000) {
-                return IAFacil();
-            }
-            return minimax([...estadoJogo], 0, true).jogada;
-        }
-
-        function realizarJogadaIA() {
-            if (!jogoAtivo) return;
+    document.querySelectorAll('.topic-btn').forEach(botao => {
+        botao.addEventListener('click', function() {
+            const hardEstavaAtivo = document.querySelector('.topic-btn[data-difficulty="hard"]').classList.contains('active');
+            const eBotaoDificil = this.dataset.difficulty === 'hard';
             
-            let jogada;
-            if (modoSecreto && dificuldadeIA === 'hard') {
-                jogada = IAFacil();
-            } else {
-                switch (dificuldadeIA) {
-                    case 'easy': jogada = IAFacil(); break;
-                    case 'medium': jogada = IAMedio(); break;
-                    case 'hard': jogada = IADificil(); break;
-                }
-            }
-
-            if (estadoJogo[jogada] === '') {
-                estadoJogo[jogada] = 'O';
-                celulas[jogada].classList.add('O');
-                verificarVencedor();
-            }
+            document.querySelectorAll('.topic-btn').forEach(btn => {
+                btn.classList.remove('active', 'secret');
+            });
             
-            celulas.forEach(c => c.classList.remove('disabled'));
-        }
-
-        document.querySelectorAll('.difficulty-btn').forEach(botao => {
-            botao.addEventListener('click', function() {
-                const hardEstavaAtivo = document.querySelector('.difficulty-btn[data-difficulty="hard"]').classList.contains('active');
-                const eBotaoDificil = this.dataset.difficulty === 'hard';
-                
-                document.querySelectorAll('.difficulty-btn').forEach(btn => {
-                    btn.classList.remove('active', 'secret');
-                });
-                
-                this.classList.add('active');
-                dificuldadeIA = this.dataset.difficulty;
-                
-                if (eBotaoDificil) {
-                    if (hardEstavaAtivo) {
-                        modoSecreto = !modoSecreto;
-                        this.classList.toggle('secret', modoSecreto);
-                    } else {
-                        modoSecreto = false;
-                    }
+            this.classList.add('active');
+            dificuldadeIA = this.dataset.difficulty;
+            
+            if (eBotaoDificil) {
+                if (hardEstavaAtivo) {
+                    modoSecreto = !modoSecreto;
+                    this.classList.toggle('secret', modoSecreto);
                 } else {
                     modoSecreto = false;
                 }
-                
-                reiniciarJogo();
-            });
+            } else {
+                modoSecreto = false;
+            }
+            
+            reiniciarJogo();
         });
+    });
 
-        reiniciarJogo();
+    reiniciarJogo();
 </script>
 </body>
 </html>
